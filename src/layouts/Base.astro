@@ -1,0 +1,71 @@
+---
+import "../styles/global.css";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+
+interface Props {
+    title?: string;
+    description?: string;
+}
+const { title, description = SITE_DESCRIPTION } = Astro.props;
+const fullTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+
+const path = Astro.url.pathname;
+const links = [
+    { href: "/", label: "Home" },
+    { href: "/tags", label: "Tags" },
+    { href: "/search", label: "Search" },
+    { href: "/rss.xml", label: "RSS" },
+];
+const isCurrent = (href: string) =>
+    href === "/" ? path === "/" : path.startsWith(href);
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{fullTitle}</title>
+        <meta name="description" content={description} />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link
+            rel="alternate"
+            type="application/rss+xml"
+            title={SITE_TITLE}
+            href="/rss.xml"
+        />
+        <!-- Milestone (b) replaces this block with canonical + Open Graph tags -->
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to content</a>
+        <header class="site-header">
+            <div class="wrap">
+                <a class="site-title" href="/">{SITE_TITLE}</a>
+                <nav class="site-nav" aria-label="Main">
+                    <ul>
+                        {
+                            links.map((l) => (
+                                <li>
+                                    <a
+                                        href={l.href}
+                                        aria-current={
+                                            isCurrent(l.href)
+                                                ? "page"
+                                                : undefined
+                                        }
+                                    >
+                                        {l.label}
+                                    </a>
+                                </li>
+                            ))
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <main id="main" class="wrap"><slot /></main>
+        <footer class="site-footer">
+            <div class="wrap">© {new Date().getFullYear()} {SITE_TITLE}</div>
+        </footer>
+    </body>
+</html>
